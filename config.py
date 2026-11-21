@@ -13,6 +13,23 @@ import os
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
+def _load_env_file():
+    """本地部署用的 .env（不入库）：KEY=VALUE，每行一条。"""
+    path = os.path.join(ROOT, ".env")
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+_load_env_file()
+
+
 def _pick(env, *cands):
     for p in (os.environ.get(env),) + cands:
         if p and os.path.isdir(p):

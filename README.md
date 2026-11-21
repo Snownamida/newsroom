@@ -71,6 +71,19 @@ python3 mail_issue.py        # 可选：发邮件
 **旧条目不会丢**：页面把「历史快照里有、反馈日志里没有」的条目继续挂着，按批次分组，
 直到你点了为止。没有条数上限，也没有过期时间。
 
+## 本机部署配置
+
+私有部署的东西（监听地址、邮箱、令牌路径、数据目录）写在不入库的 `.env` 里：
+
+```sh
+NEWS_HOST=192.168.1.10
+MAIL_FROM=you@outlook.com
+OUTLOOK_TOKEN_FILE=/path/to/token.json
+NEWSROOM_DATA=/srv/newsroom-data
+```
+
+`config.py` 启动时会读它；同名环境变量优先级更高。
+
 ## 发信（可选）
 
 走 Outlook 的 SMTP + OAuth2（XOAUTH2），不需要应用密码：

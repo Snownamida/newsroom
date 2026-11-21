@@ -3,3 +3,6 @@ __pycache__/
 *.log
 # 运行时数据自己另存；仓库里只有 data-sample/
 data/
+
+# 本地部署配置
+.env

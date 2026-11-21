@@ -16,6 +16,8 @@ import urllib.request
 from email.message import EmailMessage
 from email.utils import formataddr, formatdate
 
+import config  # noqa: F401  —— 副作用：先加载 .env，下面的 os.environ 才读得到
+
 TOKF = os.environ.get("OUTLOOK_TOKEN_FILE", os.path.expanduser("~/.config/newsroom/outlook_token.json"))
 LOCKF = TOKF + ".lock"
 CLIENT = "9e5f94bc-e8a4-4e73-b8be-63364c29d753"
