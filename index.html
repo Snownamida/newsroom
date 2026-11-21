@@ -48,8 +48,17 @@
   .src{display:flex;justify-content:space-between;align-items:center;gap:8px;
        color:var(--dim);font-size:12px;margin-bottom:10px}
   .src a{color:var(--accent);text-decoration:none;white-space:nowrap}
-  .acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .acts{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .acts button{font-size:13px;padding:9px 0}
   .acts button.on{background:#1b2a3a;border-color:#3b5a78;color:#bcd8f5}
+  .acts button.on[data-r="5"]{background:#15301f;border-color:#2f6a45;color:#b7f0cd}
+  .acts button.on[data-r="4"]{background:#16291f;border-color:#2b5540;color:#b9e6c9}
+  .acts button.on[data-r="3"]{background:#1b2430;border-color:#3a4a5c;color:#c3d0de}
+  .acts button.on[data-r="2"]{background:#30211b;border-color:#67402f;color:#efc7b8}
+  .acts button.on[data-r="1"]{background:#30181a;border-color:#6b3136;color:#f0b9bd}
+  .acts2{margin-top:8px;display:flex;justify-content:flex-start}
+  .acts2 button{font-size:13px;padding:6px 12px;border-radius:999px;color:#9aa6b2}
+  .acts2 button.on{background:#1b2430;border-color:#3a4a5c;color:#c3d0de}
   button{font:inherit;font-size:14px;padding:9px 4px;border-radius:10px;
          border:1px solid var(--line);background:#1d212a;color:var(--text);
          cursor:pointer;transition:transform .08s,background .15s}
@@ -143,28 +152,28 @@ function card(it){
     <div class="src"><span>${esc(it.source||'')}</span>
       <span>${it.tr ? `<a href="read.html?id=${encodeURIComponent(it.id)}">中文译文</a> · ` : ''}${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">原文 ↗</a>` : ''}</span></div>
     <div class="acts">
-      <button data-a="up">👍 有用</button>
-      <button data-a="down">👎 无聊</button>
-      <button data-a="confused">❓ 不懂</button>
-      <button data-a="skip">不感兴趣</button>
+      <button data-r="5">超赞</button>
+      <button data-r="4">还行</button>
+      <button data-r="3">一般</button>
+      <button data-r="2">较差</button>
+      <button data-r="1">无聊</button>
     </div>
+    <div class="acts2"><button class="conf">❓ 不懂</button></div>
     <div class="extra">
       <textarea placeholder="✍️ 写一句（可以同时点上边的按钮）"></textarea>
       <button class="sav">保存这句</button>
     </div>`;
-  el._st = {up:0,down:0,confused:0,skip:0,note:''};
+  el._st = {rating:0,confused:0,note:''};
   el.querySelectorAll('.acts button').forEach(b=>{
     b.addEventListener('click', ()=>{
-      const k = b.dataset.a, st = el._st;
-      const v = st[k] ? 0 : 1;
-      const sig = {}; sig[k] = v;
-      if(v && k==='up'){ sig.down = 0; }
-      if(v && k==='down'){ sig.up = 0; }
-      if(v && k==='skip'){ sig.up = 0; sig.down = 0; }
-      if(v && (k==='up'||k==='down')){ sig.skip = 0; }
-      push(it, sig, el);
-      if(v) setTimeout(()=>jumpToNextUnanswered(el), 120);
+      const r = +b.dataset.r;
+      const next = (el._st.rating === r) ? 0 : r;   // 再点一次取消
+      push(it, {rating:next}, el);
+      if(next) setTimeout(()=>jumpToNextUnanswered(el), 120);
     });
+  });
+  el.querySelector('.conf').addEventListener('click', ()=>{
+    push(it, {confused: el._st.confused ? 0 : 1}, el);
   });
   const kws = it.keywords || [];
   it._slugs = (it.slugs || []);
@@ -185,7 +194,7 @@ function jumpToNextUnanswered(el){
   const i=cards.indexOf(el);
   for(let j=i+1;j<cards.length;j++){
     const s=cards[j]._st||{};
-    if(!(s.up||s.down||s.confused||s.skip||s.note)){
+    if(!(s.rating||s.confused||s.note)){
       cards[j].scrollIntoView({behavior:'smooth',block:'start'});
       return;
     }
@@ -197,32 +206,37 @@ function jumpToNextUnanswered(el){
 function paintActs(el){
   const st = el._st;
   el.querySelectorAll('.acts button').forEach(b=>{
-    const on = !!st[b.dataset.a];
-    b.classList.toggle('on', on);
-    b.textContent = {up:'👍 有用',down:'👎 无聊',confused:'❓ 不懂',skip:'不感兴趣'}[b.dataset.a] + (on ? ' ✓' : '');
+    b.classList.toggle('on', +b.dataset.r === st.rating);
   });
+  const c = el.querySelector('.conf');
+  if(c) c.classList.toggle('on', !!st.confused);
   if(st.note){ el.querySelector('textarea').value = st.note; }
   refreshProgress();
 }
 
+const RATING_WORD = {5:'超赞',4:'还行',3:'一般',2:'较差',1:'无聊'};
+
 async function push(it, sig, el, note){
   try{
     const body = {id:it.id,title:it.title,topic:it.topic,why:it.why};
-    if(Object.keys(sig).length) body.signals = sig;
+    if('rating' in sig) body.rating = sig.rating;
+    if('confused' in sig) body.signals = {confused: sig.confused};
     if(note) body.note = note;
     const r = await fetch('/api/feedback', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
     if(!r.ok) throw new Error('HTTP '+r.status);
     Object.assign(el._st, sig);
     if(note) el._st.note = note;
     paintActs(el);
-    toast(note ? '这句存下了' : (sig.up===1 ? '👍 记下' : sig.down===1 ? '👎 记下' : sig.confused===1 ? '下次多讲背景' : sig.skip===1 ? '已标记' : '已更新'));
+    if(note) toast('这句存下了');
+    else if('rating' in sig) toast(sig.rating ? RATING_WORD[sig.rating] + ' 记下' : '取消了');
+    else toast(sig.confused ? '下次多讲背景' : '已更新');
   }catch(e){ toast('没存上：'+e.message); }
 }
 
 function refreshProgress(){
   const tot = items.length;
   const n = [...document.querySelectorAll('.card')].filter(c=>{
-    const s=c._st||{}; return s.up||s.down||s.confused||s.skip||s.note;
+    const s=c._st||{}; return s.rating||s.confused||s.note;
   }).length;
   done = n;
   document.getElementById('prog').textContent = n + ' / ' + tot;
@@ -296,7 +310,9 @@ function toast(m){
     if(!srv) return;
     const el = list.querySelector(`.card[data-id="${CSS.escape(it.id)}"]`);
     if(!el) return;
-    el._st = {up:+!!srv.up, down:+!!srv.down, confused:+!!srv.confused, skip:+!!srv.skip, note:srv.note||''};
+    // 老数据（up/down/skip）映射到五档，保持"已评过"的状态
+    const legacy = srv.up ? 4 : srv.down ? 2 : srv.skip ? 1 : 0;
+    el._st = {rating: srv.rating || legacy, confused:+!!srv.confused, note:srv.note||''};
     paintActs(el);
   });
   refreshProgress();

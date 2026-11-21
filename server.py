@@ -29,7 +29,8 @@ def feedback_rows():
 def reviewed_ids():
     """有过任何实质反馈的条目（注释、整体复盘不算）。"""
     return {r.get("id") for r in feedback_rows()
-            if r.get("action") not in (None, "note", "review", "stated")}
+            if r.get("action") not in (None, "note", "review", "stated")
+            and r.get("value", 1)}
 
 
 _LAST_ISSUE = {}
@@ -168,14 +169,23 @@ class H(BaseHTTPRequestHandler):
         recs = []
         # 去重：与当前状态相同则忽略（防止自动点击器反复写入）
         cur = H._today()["state"].get(payload.get("id"), {})
+        rating = payload.get("rating")
         sig = payload.get("signals")
-        if isinstance(sig, dict):
+        if rating is not None:
+            try:
+                rating = int(rating)
+            except Exception:
+                rating = 0
+            rating = max(0, min(5, rating))
+            if cur.get("rating", 0) != rating:
+                recs.append({**base, "action": "rating", "value": rating, "note": ""})
+        elif isinstance(sig, dict):
             for k, v in sig.items():
                 v = 1 if v else 0
                 if cur.get(k, 0) == v:
                     continue
                 recs.append({**base, "action": k, "value": v, "note": ""})
-        else:
+        elif payload.get("action"):
             recs.append({**base, "action": payload.get("action"), "value": 1, "note": payload.get("note", "")})
         note = (payload.get("note") or "").strip()
         if note and cur.get("note") != note:
