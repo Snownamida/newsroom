@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.log
+# 运行时数据自己另存；仓库里只有 data-sample/
+data/

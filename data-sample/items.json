@@ -1,0 +1,63 @@
+{
+ "date": "示例 · 第 1 期",
+ "items": [
+  {
+   "id": "sample-rocket",
+   "topic": "航天",
+   "why": "常看",
+   "entity": "Starship",
+   "title": "示例条目：火箭回收为什么难",
+   "summary": "第一条示例。这里放三到五段中文摘要，讲清楚发生了什么、为什么重要、接下来看什么。\n\n第二段可以补充背景：这个领域里哪些词是外行不熟的，第一次出现时要给一句定位。\n\n第三段给结论，而不是留悬念。",
+   "source": "example.com",
+   "url": "https://example.com/rocket",
+   "keywords": [
+    {
+     "t": "可重复使用运载器"
+    },
+    {
+     "t": "再入大气层"
+    }
+   ],
+   "slugs": [
+    "7d00795844",
+    "241ac2d28a"
+   ]
+  },
+  {
+   "id": "sample-astronomy",
+   "topic": "天文",
+   "why": "探索",
+   "entity": "",
+   "title": "示例条目：今晚可以看的合相",
+   "summary": "第二条示例，展示「探索位」长什么样：不在平时的兴趣里，但值得看一眼。\n\n摘要同样要给出观测时间、方位和结论。",
+   "source": "example.com",
+   "url": "https://example.com/sky",
+   "keywords": [
+    {
+     "t": "可重复使用运载器"
+    }
+   ],
+   "slugs": [
+    "7d00795844"
+   ]
+  },
+  {
+   "id": "sample-old",
+   "topic": "编程",
+   "why": "探索",
+   "entity": "",
+   "title": "示例条目：一条旧文为什么还在被转",
+   "summary": "第三条示例，类型是「旧文/常青」。页面按批次分组，等你反馈。",
+   "source": "example.com",
+   "url": "https://example.com/old",
+   "keywords": [
+    {
+     "t": "再入大气层"
+    }
+   ],
+   "slugs": [
+    "241ac2d28a"
+   ]
+  }
+ ]
+}

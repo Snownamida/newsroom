@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全部条目 · 归档</title>
+<style>
+  :root{--bg:#0f1115;--card:#171a21;--line:#252a34;--text:#e8eaed;--dim:#9aa4b2;--accent:#6ea8fe}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Noto Sans SC",sans-serif;padding-bottom:30px}
+  header{position:sticky;top:0;background:rgba(15,17,21,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 12px}
+  .row{display:flex;gap:8px;align-items:center}
+  input{flex:1;background:#12151b;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 11px;font:inherit}
+  a.back{color:var(--dim);text-decoration:none;font-size:13px;white-space:nowrap}
+  #chips{display:flex;gap:6px;overflow-x:auto;padding:9px 0 2px;scrollbar-width:none}
+  #chips button{white-space:nowrap;font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:#141821;color:var(--dim)}
+  #chips button.on{color:#bcd8f5;border-color:#3b5a78;background:#1b2a3a}
+  #meta{color:var(--dim);font-size:12px;padding:8px 14px 0}
+  ul{list-style:none;margin:0;padding:6px 12px}
+  li{padding:9px 0;border-bottom:1px solid #1c2129}
+  li a{color:var(--text);text-decoration:none;display:block}
+  li a:hover{color:var(--accent)}
+  .sub{color:var(--dim);font-size:12px;margin-top:2px}
+  .more{margin:14px 12px;width:calc(100% - 24px);padding:10px;border-radius:10px;border:1px solid var(--line);background:#17202b;color:#a9c7ff;font:inherit}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <a class="back" href="index.html">← 精选</a>
+    <input id="q" placeholder="搜标题、来源…">
+  </div>
+  <div id="chips"></div>
+</header>
+<div id="meta"></div>
+<ul id="list"></ul>
+<button class="more" id="more" style="display:none">显示更多</button>
+<script>
+let all=[], topic='全部', limit=80;
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function rel(ts){
+  const d=new Date(ts), h=(Date.now()-d)/3.6e6;
+  if(h<1) return Math.max(1,Math.round(h*60))+' 分钟前';
+  if(h<24) return Math.round(h)+' 小时前';
+  return Math.round(h/24)+' 天前';
+}
+function render(){
+  const q=document.getElementById('q').value.trim().toLowerCase();
+  let rows=all.filter(i=>(topic==='全部'||i.topic===topic) && (!q|| (i.title+' '+i.source).toLowerCase().includes(q)));
+  document.getElementById('meta').textContent=`${rows.length} 条 · 最近 7 天`;
+  const ul=document.getElementById('list'); ul.innerHTML='';
+  rows.slice(0,limit).forEach(i=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title)}</a>
+      <div class="sub">${esc(i.source)} · ${esc(i.topic)} · ${rel(i.ts)}</div>`;
+    ul.appendChild(li);
+  });
+  document.getElementById('more').style.display = rows.length>limit?'block':'none';
+}
+(async()=>{
+  const d=await (await fetch('/api/archive')).json();
+  all=d.items||[];
+  const counts={}; all.forEach(i=>counts[i.topic]=(counts[i.topic]||0)+1);
+  const tops=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  const c=document.getElementById('chips');
+  ['全部',...tops].forEach(t=>{
+    const b=document.createElement('button'); b.textContent=t + (t==='全部'?'':' '+counts[t]);
+    if(t==='全部') b.classList.add('on');
+    b.onclick=()=>{topic=t;limit=80;[...c.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');render();};
+    c.appendChild(b);
+  });
+  document.getElementById('q').oninput=()=>{limit=80;render();};
+  document.getElementById('more').onclick=()=>{limit+=80;render();};
+  render();
+})();
+</script>
+</body>
+</html>

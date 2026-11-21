@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>译文</title>
+<style>
+  :root{--bg:#0f1115;--line:#252a34;--text:#e8eaed;--dim:#9aa4b2;--accent:#6ea8fe}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.8 system-ui,-apple-system,"Noto Sans SC",serif;padding-bottom:44px}
+  header{position:sticky;top:0;background:rgba(15,17,21,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 14px;display:flex;gap:12px;align-items:center}
+  header a{color:var(--dim);text-decoration:none;font-size:14px}
+  main{padding:16px 18px 0;max-width:760px;margin:0 auto}
+  h1{font-size:21px;line-height:1.4;margin:0 0 6px}
+  .meta{color:var(--dim);font-size:13px;margin-bottom:14px}
+  .meta a{color:var(--accent);text-decoration:none}
+  .kws{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+  .kw{font-size:12px;padding:4px 9px;border-radius:999px;border:1px dashed #33414f;background:#131a22;color:#9fc0e8;text-decoration:none}
+  p{margin:0 0 14px;color:#d7dbe2}
+  .note{color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header><a href="index.html">← 返回</a><span style="color:#5b636f;font-size:13px">译文</span></header>
+<main>
+  <h1 id="t">加载中…</h1>
+  <div class="meta" id="m"></div>
+  <div class="kws" id="k"></div>
+  <div id="b"></div>
+</main>
+<script>
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+(async()=>{
+  const id=new URLSearchParams(location.search).get('id');
+  const d=await (await fetch('/api/items')).json();
+  const it=(d.items||[]).find(x=>x.id===id);
+  if(!it){document.getElementById('t').textContent='找不到这条';return;}
+  document.title=it.title;
+  document.getElementById('t').textContent=it.title;
+  document.getElementById('m').innerHTML=`${esc(it.source)} · 中文译文`+(it.url?` · <a href="${esc(it.url)}" target="_blank" rel="noopener">原文 ↗</a>`:'');
+  const kw=document.getElementById('k');
+  (it.keywords||[]).forEach((x,i)=>{
+    const a=document.createElement('a'); a.className='kw';
+    a.href='entry.html?slug='+encodeURIComponent((it.slugs||[])[i]||'');
+    a.textContent=x.t; kw.appendChild(a);
+  });
+  const box=document.getElementById('b');
+  const ps=it.tr||[];
+  if(!ps.length){ box.innerHTML='<p class="note">这篇的中文译文还在生成。</p>'; return; }
+  ps.forEach(p=>{ const el=document.createElement('p'); el.textContent=p; box.appendChild(el); });
+  const tail=document.createElement('p'); tail.className='note';
+  tail.textContent='译文由机器翻译生成，专有名词可能有偏差。';
+  box.appendChild(tail);
+})();
+</script>
+</body>
+</html>

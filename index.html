@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>今日新闻 · 2026-11-10</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --line:#252a34;
+    --text:#e8eaed; --dim:#9aa4b2; --accent:#6ea8fe;
+    --ok:#3ddc97; --bad:#ff6b6b; --ask:#ffc857; --skip:#7b8494;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font:16px/1.55 system-ui,-apple-system,"Noto Sans SC",sans-serif;
+       padding:0 0 40px}
+  header{position:sticky;top:0;z-index:5;background:rgba(15,17,21,.94);
+         backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+         padding:12px 16px 10px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  h1{font-size:16px;margin:0;font-weight:600}
+  h1 small{color:var(--dim);font-weight:400;margin-left:6px;font-size:12px}
+  #prog{color:var(--dim);font-size:13px;white-space:nowrap}
+  .bar{height:3px;background:var(--line);border-radius:2px;margin-top:9px;overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+  main{padding:14px 12px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        padding:14px 14px 12px;margin:0 0 12px;transition:opacity .25s}
+  .card.done{opacity:.5}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .batch{margin:20px 2px 10px;font-size:13px;color:#8794a3;letter-spacing:.02em;
+    border-top:1px solid #232a35;padding-top:12px}
+  .batch b{color:#c3ccd8;font-weight:600}
+  .chip{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
+  .chip.t{color:#a9c7ff;border-color:#2b3a55;background:#141a26}
+  .chip.w-常看{color:#8fd3ff;border-color:#243a4d;background:#131d26}
+  .chip.w-探索,.chip.w-探索（你还没接触过）{color:#c9a7ff;border-color:#3a2b55;background:#1a1426}
+  .chip.w-必知{color:#ffc857;border-color:#4d3c1f;background:#241d11}
+  h2{font-size:17px;line-height:1.4;margin:0 0 6px;font-weight:650}
+  p{margin:0 0 8px;color:#c7ccd4}
+  .note{background:#131a22;border-left:3px solid #2f4a63;border-radius:8px;
+        padding:8px 10px;color:#a8c4dc;font-size:14px;margin:0 0 10px}
+  .thumb{display:block;width:100%;max-height:190px;object-fit:cover;border-radius:10px;
+         margin:0 0 10px;background:#10141a}
+  .term{background:#121820;border:1px solid #22303f;border-radius:8px;
+        padding:7px 10px;color:#b9c6d6;font-size:13px;line-height:1.5;margin:0 0 9px}
+  .src{display:flex;justify-content:space-between;align-items:center;gap:8px;
+       color:var(--dim);font-size:12px;margin-bottom:10px}
+  .src a{color:var(--accent);text-decoration:none;white-space:nowrap}
+  .acts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .acts button.on{background:#1b2a3a;border-color:#3b5a78;color:#bcd8f5}
+  button{font:inherit;font-size:14px;padding:9px 4px;border-radius:10px;
+         border:1px solid var(--line);background:#1d212a;color:var(--text);
+         cursor:pointer;transition:transform .08s,background .15s}
+  button:active{transform:scale(.96)}
+  button[data-a=up]{color:var(--ok);border-color:#1f4a3a}
+  button[data-a=down]{color:var(--bad);border-color:#4a2323}
+  button[data-a=confused]{color:var(--ask);border-color:#4a3d1a}
+  button[data-a=skip]{color:var(--skip)}
+  .extra{margin-top:9px;display:block}
+  .extra textarea{width:100%;min-height:44px;background:#12151b;color:var(--text);
+        border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:14px;
+        resize:vertical}
+  .extra textarea::placeholder{color:#68727f}
+  .extra .sav{margin-top:6px;width:100%;background:#1c2733;border-color:#284056;color:#a9c7ff}
+            background:#141b24;border:1px dashed #2b3a4d;border-radius:9px;padding:7px}
+  #global{margin:22px 12px 0;padding:14px;border:1px solid var(--line);
+          border-radius:14px;background:var(--card)}
+  #global h3{margin:0 0 4px;font-size:15px}
+  #global .hint{margin:0 0 10px;color:var(--dim);font-size:13px}
+  #global textarea{width:100%;min-height:74px;background:#12151b;color:var(--text);
+      border:1px solid var(--line);border-radius:10px;padding:9px;font:inherit;font-size:14px}
+  #gsave{margin-top:8px;width:100%;background:#1c2733;border-color:#284056;color:#a9c7ff}
+  .kws{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+  .kw{font-size:12px;padding:4px 9px;border-radius:999px;border:1px dashed #33414f;
+      background:#131a22;color:#9fc0e8;text-decoration:none;display:inline-block}
+  .kw:before{content:"？";opacity:.6;margin-right:3px}
+  #dim{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;
+       transition:.2s;z-index:25}
+  #dim.on{opacity:1;pointer-events:auto}
+  #sheet{position:fixed;left:0;right:0;bottom:0;background:#1a1f27;border-top:1px solid #2b3442;
+         border-radius:16px 16px 0 0;padding:14px 16px 30px;transform:translateY(115%);
+         transition:.25s;z-index:30;max-height:72vh;overflow:auto}
+  #sheet.on{transform:translateY(0)}
+  #sheet h4{margin:0 0 8px;font-size:16px;padding-right:30px}
+  #sheet p{margin:0;color:#c7ccd4;font-size:14px;line-height:1.65}
+  #sheet .close{position:absolute;right:12px;top:10px;background:none;border:none;
+                color:#9aa4b2;font-size:20px;line-height:1}
+  #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(30px);
+         background:#232a36;border:1px solid #38404f;color:#dfe5ee;padding:9px 16px;
+         border-radius:999px;font-size:14px;opacity:0;transition:.22s;pointer-events:none;
+         max-width:88vw;text-align:center}
+  #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  .end{text-align:center;color:var(--dim);font-size:14px;padding:24px 12px}
+  .end b{color:var(--ok)}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <h1><a href="all.html" style="color:inherit;text-decoration:none" title="全部条目">今日新闻</a> <small id="dt"></small></h1>
+    <div id="prog">0 / 0</div>
+  </div>
+  <div class="bar"><i id="pbar"></i></div>
+  <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+    <a href="all.html" style="color:#6ea8fe;font-size:13px;text-decoration:none">看全部归档 →</a>
+    <button id="refresh" style="font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid #2b3442;background:#141b24;color:#9fc0e8">↻ 抓取最新</button>
+  </div>
+</header>
+<main id="list"></main>
+<section id="global">
+  <h3>这期整体怎么样？</h3>
+  <p class="hint">太长？太杂？哪条其实想多看点？写在这里，我复盘时会看。</p>
+  <textarea id="gtext" placeholder="比如：太长了，8 条就够 / 想多来点轨道交通的深度 / Starship 那种以后多给背景"></textarea>
+  <button id="gsave">保存整体反馈</button>
+</section>
+<div id="dim"></div>
+<div id="sheet"><button class="close">×</button><h4></h4><p></p></div>
+<div id="toast"></div>
+
+<script>
+const LS = k => 'newsfb:' + k;
+let items = [], done = 0;
+
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+function card(it){
+  const el = document.createElement('article');
+  el.className = 'card';
+  el.dataset.id = it.id;
+  el.innerHTML = `
+    <div class="chips">
+      <span class="chip t">${esc(it.topic)}</span>
+      <span class="chip w-${esc(it.why)}">${esc(it.why)}</span>
+    </div>
+    <h2>${esc(it.title)}</h2>
+    ${it.img ? `<img class="thumb" loading="lazy" referrerpolicy="no-referrer" src="${esc(it.img)}" onerror="this.remove()">` : ''}
+    ${it.term ? `<div class="term">📖 ${esc(it.term)}</div>` : ''}
+    ${String(it.summary||'').split('\n\n').map(p=>`<p>${esc(p)}</p>`).join('')}
+    ${it.note ? `<div class="note">${esc(it.note)}</div>` : ''}
+    ${(it.keywords&&it.keywords.length) ? `<div class="kws">${it.keywords.map((k,idx)=>`<a class="kw" href="entry.html?slug=${encodeURIComponent((it.slugs||[])[idx]||'')}">${esc(k.t)}</a>`).join('')}</div>` : ''}
+    <div class="src"><span>${esc(it.source||'')}</span>
+      <span>${it.tr ? `<a href="read.html?id=${encodeURIComponent(it.id)}">中文译文</a> · ` : ''}${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">原文 ↗</a>` : ''}</span></div>
+    <div class="acts">
+      <button data-a="up">👍 有用</button>
+      <button data-a="down">👎 无聊</button>
+      <button data-a="confused">❓ 不懂</button>
+      <button data-a="skip">不感兴趣</button>
+    </div>
+    <div class="extra">
+      <textarea placeholder="✍️ 写一句（可以同时点上边的按钮）"></textarea>
+      <button class="sav">保存这句</button>
+    </div>`;
+  el._st = {up:0,down:0,confused:0,skip:0,note:''};
+  el.querySelectorAll('.acts button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const k = b.dataset.a, st = el._st;
+      const v = st[k] ? 0 : 1;
+      const sig = {}; sig[k] = v;
+      if(v && k==='up'){ sig.down = 0; }
+      if(v && k==='down'){ sig.up = 0; }
+      if(v && k==='skip'){ sig.up = 0; sig.down = 0; }
+      if(v && (k==='up'||k==='down')){ sig.skip = 0; }
+      push(it, sig, el);
+    });
+  });
+  const kws = it.keywords || [];
+  it._slugs = (it.slugs || []);
+  el.querySelectorAll('.kw').forEach((b,i)=>{
+    b.addEventListener('click', ()=> { location.href='entry.html?slug='+encodeURIComponent(it._slugs[i]); });
+  });
+  el.querySelector('.sav').onclick = ()=>{
+    const t = el.querySelector('textarea').value.trim();
+    if(!t) return toast('写点字再保存');
+    push(it, {}, el, t);
+  };
+  return el;
+}
+
+function paintActs(el){
+  const st = el._st;
+  el.querySelectorAll('.acts button').forEach(b=>{
+    const on = !!st[b.dataset.a];
+    b.classList.toggle('on', on);
+    b.textContent = {up:'👍 有用',down:'👎 无聊',confused:'❓ 不懂',skip:'不感兴趣'}[b.dataset.a] + (on ? ' ✓' : '');
+  });
+  if(st.note){ el.querySelector('textarea').value = st.note; }
+  refreshProgress();
+}
+
+async function push(it, sig, el, note){
+  try{
+    const body = {id:it.id,title:it.title,topic:it.topic,why:it.why};
+    if(Object.keys(sig).length) body.signals = sig;
+    if(note) body.note = note;
+    const r = await fetch('/api/feedback', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    Object.assign(el._st, sig);
+    if(note) el._st.note = note;
+    paintActs(el);
+    toast(note ? '这句存下了' : (sig.up===1 ? '👍 记下' : sig.down===1 ? '👎 记下' : sig.confused===1 ? '下次多讲背景' : sig.skip===1 ? '已标记' : '已更新'));
+  }catch(e){ toast('没存上：'+e.message); }
+}
+
+function refreshProgress(){
+  const tot = items.length;
+  const n = [...document.querySelectorAll('.card')].filter(c=>{
+    const s=c._st||{}; return s.up||s.down||s.confused||s.skip||s.note;
+  }).length;
+  done = n;
+  document.getElementById('prog').textContent = n + ' / ' + tot;
+  document.getElementById('pbar').style.width = tot? (n*100/tot)+'%' : '0';
+  const end = document.getElementById('endnote');
+  if(end) end.style.display = n>=tot ? 'block' : 'none';
+}
+
+
+function openSheet(t,d){
+  const s=document.getElementById('sheet');
+  s.querySelector('h4').textContent=t;
+  s.querySelector('p').textContent=d;
+  s.classList.add('on'); document.getElementById('dim').classList.add('on');
+}
+function closeSheet(){
+  document.getElementById('sheet').classList.remove('on');
+  document.getElementById('dim').classList.remove('on');
+}
+document.getElementById('dim').onclick=closeSheet;
+document.querySelector('#sheet .close').onclick=closeSheet;
+
+document.getElementById('refresh').onclick = async ()=>{
+  const b=document.getElementById('refresh');
+  b.disabled=true; b.textContent='抓取中…';
+  try{ await fetch('/api/refresh',{method:'POST'}); toast('已在后台抓取，约 1 分钟'); }
+  catch(e){ toast('抓取失败'); }
+  setTimeout(()=>{ b.disabled=false; b.textContent='↻ 抓取最新'; }, 60000);
+};
+
+let tid;
+function toast(m){
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('on');
+  clearTimeout(tid); tid = setTimeout(()=>t.classList.remove('on'), 1600);
+}
+
+(async ()=>{
+  if(location.search.includes('reset')){
+    Object.keys(localStorage).filter(k=>k.startsWith('newsfb:')).forEach(k=>localStorage.removeItem(k));
+  }
+  const data = await (await fetch('/api/items')).json();
+  items = data.items || [];
+  document.getElementById('dt').textContent = data.date || '';
+  const list = document.getElementById('list');
+  // 按批次分组：没反馈的旧条目一直留着，用分隔条标出是哪一期
+  let lastBatch = null, group = [];
+  const flush = ()=>{
+    if(!group.length) return;
+    const h = document.createElement('div'); h.className='batch';
+    h.innerHTML = `<b>${esc(lastBatch || data.date || '')}</b> · ${group.length} 条`;
+    list.appendChild(h);
+    group.forEach(it=>list.appendChild(card(it)));
+    group = [];
+  };
+  items.forEach(it=>{
+    const b = it.batch || data.date || '';
+    if(b !== lastBatch){ flush(); lastBatch = b; }
+    group.push(it);
+  });
+  flush();
+  const end = document.createElement('div');
+  end.className='end'; end.id='endnote'; end.style.display='none';
+  end.innerHTML = '<b>全部反馈完了</b><br>回到 DSH 说一句你的新想法，我会更新偏好表。';
+  list.appendChild(end);
+  // 以服务端记录为准：state = {id: {up,down,confused,skip,note}}
+  let server = {};
+  try{ const st = await (await fetch('/api/today')).json(); server = st.state || {}; }catch(e){}
+  items.forEach(it=>{
+    const srv = server[it.id];
+    if(!srv) return;
+    const el = list.querySelector(`.card[data-id="${CSS.escape(it.id)}"]`);
+    if(!el) return;
+    el._st = {up:+!!srv.up, down:+!!srv.down, confused:+!!srv.confused, skip:+!!srv.skip, note:srv.note||''};
+    paintActs(el);
+  });
+  refreshProgress();
+
+  const g = document.getElementById('gsave'), gt = document.getElementById('gtext');
+  // 每期用「条目 id 指纹」做键：换一批就是新的一期，绝不回填上一期的内容
+  const gk = 'newsfb:global:' + items.map(i=>i.id).join('|').length + ':' + items.length + ':' + (data.date||'');
+  if(localStorage.getItem(gk)){ g.textContent='本期已提交 ✓'; g.disabled=true; gt.disabled=true; }
+  g.onclick = async ()=>{
+    const note = gt.value.trim();
+    if(!note) return toast('写点内容再保存');
+    try{
+      const r = await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({id:'digest-'+(data.date||''),title:'整体反馈',topic:'meta',why:'复盘',action:'review',note})});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      localStorage.setItem(gk, note); g.textContent='本期已提交 ✓'; g.disabled=true;
+      gt.value=''; gt.disabled=true;
+      toast('整体反馈已保存');
+    }catch(e){ toast('没存上：'+e.message); }
+  };
+})();
+</script>
+</body>
+</html>

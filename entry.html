@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>词条</title>
+<style>
+  :root{--bg:#0f1115;--line:#252a34;--text:#e8eaed;--dim:#9aa4b2;--accent:#6ea8fe}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.75 system-ui,-apple-system,"Noto Sans SC",serif;padding:0 0 40px}
+  header{position:sticky;top:0;background:rgba(15,17,21,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 14px;display:flex;gap:10px;align-items:center}
+  header a{color:var(--dim);text-decoration:none;font-size:14px}
+  main{padding:18px 18px 0;max-width:760px;margin:0 auto}
+  h1{font-size:22px;line-height:1.35;margin:0 0 10px}
+  .why{background:#131a22;border-left:3px solid #2f4a63;padding:10px 12px;border-radius:8px;color:#a8c4dc;font-size:14px;margin:0 0 18px}
+  .body p{margin:0 0 14px;color:#d7dbe2}
+  .body h2{font-size:17px;margin:22px 0 8px;color:#e8eaed}
+  .src{color:var(--dim);font-size:12px;margin-top:24px;border-top:1px solid var(--line);padding-top:12px}
+  .src a{color:var(--accent);text-decoration:none}
+  .loading{color:var(--dim);font-size:14px}
+</style>
+</head>
+<body>
+<header><a href="index.html">← 返回</a><span style="color:#5b636f;font-size:13px">词条</span></header>
+<main>
+  <h1 id="t">加载中…</h1>
+  <div class="why" id="why" style="display:none"></div>
+  <div class="body" id="b"></div>
+  <div class="src" id="s"></div>
+</main>
+<script>
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+(async()=>{
+  const slug=new URLSearchParams(location.search).get('slug');
+  if(!slug){document.getElementById('t').textContent='缺少词条参数';return;}
+  try{
+    const r=await fetch('/api/entry?slug='+encodeURIComponent(slug));
+    if(!r.ok) throw new Error('词条还没生成');
+    const e=await r.json();
+    document.title=e.term;
+    document.getElementById('t').textContent=e.term;
+    if(e.why){const w=document.getElementById('why'); w.textContent='为什么在这条新闻里：'+e.why; w.style.display='block';}
+    // 维基正文按行分段，去掉 == 标题 == 的空行噪音
+    const paras=(e.body||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    const box=document.getElementById('b');
+    for(const p of paras){
+      if(/^={2,}.*={2,}$/.test(p)){ const h=document.createElement('h2'); h.textContent=p.replace(/=/g,'').trim(); box.appendChild(h); }
+      else { const el=document.createElement('p'); el.textContent=p; box.appendChild(el); }
+    }
+    if(!paras.length){ box.innerHTML='<p class="loading">这篇词条还没有正文。</p>'; }
+    document.getElementById('s').innerHTML = e.source ? '来源：'+ (e.source.startsWith('http') ? `<a href="${esc(e.source)}" target="_blank" rel="noopener">${esc(e.source)}</a>` : esc(e.source)) : '';
+  }catch(err){
+    document.getElementById('t').textContent='词条还没生成';
+    document.getElementById('b').innerHTML='<p class="loading">'+esc(err.message)+'</p>';
+  }
+})();
+</script>
+</body>
+</html>
