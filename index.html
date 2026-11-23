@@ -218,7 +218,7 @@ const RATING_WORD = {5:'超赞',4:'还行',3:'一般',2:'较差',1:'无聊'};
 
 async function push(it, sig, el, note){
   try{
-    const body = {id:it.id,title:it.title,topic:it.topic,why:it.why};
+    const body = {id:it.id,title:it.title,topic:it.topic,why:it.why,entity:it.entity||''};
     if('rating' in sig) body.rating = sig.rating;
     if('confused' in sig) body.signals = {confused: sig.confused};
     if(note) body.note = note;

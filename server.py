@@ -165,7 +165,8 @@ class H(BaseHTTPRequestHandler):
         except Exception:
             return self._send(400, json.dumps({"ok": False, "error": "bad json"}))
         base = {"ts": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "id": payload.get("id"),
-                "title": payload.get("title"), "topic": payload.get("topic"), "why": payload.get("why")}
+                "title": payload.get("title"), "topic": payload.get("topic"), "why": payload.get("why"),
+                "entity": payload.get("entity") or ""}
         recs = []
         # 去重：与当前状态相同则忽略（防止自动点击器反复写入）
         cur = H._today()["state"].get(payload.get("id"), {})
